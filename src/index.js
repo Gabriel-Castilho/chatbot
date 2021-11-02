@@ -26,9 +26,7 @@ app.get("/", function (req, res) {
   res.send("Hello World!");
 
   client.messages.create({
-    body: `SERVER INICIADO.\nReserva`,
-    mediaUrl: ["https://cataas.com/cat"],
-
+    body: `SERVER INICIADO.\nDigite Reserva para iniciar o seu atendimento`,
     from: "whatsapp:+14155238886",
     to: "whatsapp:+5512991435651",
   }).then((message) => console.log(JSON.stringify(message)));
@@ -75,7 +73,7 @@ app.post("/whatsapp", async (req, res) => {
           results.body("Antes de iniciar uma reserva, preciso de alguns dados. Poderia informar por gentileza o seu nome, sobrenome,CPF separado por virgulas? \nExemplo: João,Silva,12345678901?\n*CONFIRME SEUS DADOS ANTES DE ENVIAR!!!*")
         }
       }
-      envio = undefined; 
+      envio = undefined;
       res.end(results.toString());
     } else if (envio == undefined) {
       const dados = req.body.Body.split(",")
@@ -172,7 +170,7 @@ app.post("/whatsapp", async (req, res) => {
       res.header("Content-Type", "text/xml").status(200);
       results.body("Parabéns, sua reserva foi registrada com sucesso. Em breve entraremos em contato para escolha dos quartos.\nDigite voltar para ir para o menu.");
 
-      if (incomingWhatsappMsg == 1) {
+      if (incomingWhatsappMsg == "1") {
         envio = true;
         results.body("Antes de iniciar uma reserva, preciso de alguns dados. Poderia informar por gentileza o seu nome, sobrenome,CPF separado por virgulas? \nExemplo: João,Silva,12345678901?\n*CONFIRME SEUS DADOS ANTES DE ENVIAR!!!*");
       }
@@ -180,15 +178,17 @@ app.post("/whatsapp", async (req, res) => {
     }
 
     else if ((incomingWhatsappMsg == "2" && menu) || (incomingWhatsappMsg == "2" && voltar)) {
+      if (valida2 == true) {
+        valida2 = false
+      }
       res.header("Content-Type", "text/xml").status(200);
       results.body("Digite seu CPF para consultar uma reserva")
-      console.log('vvalida 1' + valida2)
       valida = true
       res.end(results.toString());
 
     }
 
-    else if (valida == true && incomingWhatsappMsg != "3" && valida2 == false && incomingWhatsappMsg != "4") {
+    else if (valida == true && incomingWhatsappMsg != "3" && valida2 == false && incomingWhatsappMsg != "4" && voltar) {
       const dados = req.body.Body
       await axios.get("https://api-hotel-chatbot.herokuapp.com/cliente/" + dados).then((response) => (
         results.body("Você tem uma reserva. Confira os dados abaixos\nNome: " + response.data[0].nome + " " + response.data[0].sobrenome + "\nTelefone: " + response.data[0].telefone_celular + "\nCPF: " + response.data[0].cpf + "\nPara mais ações digite *voltar*")
@@ -211,12 +211,16 @@ app.post("/whatsapp", async (req, res) => {
         res.header("Content-Type", "text/xml").status(200);
         results.body("Para mandar um email, escreva o seu email, o assunto e o texto da mensagem separado pelo && duplo.\n*EXEMPLO* seuemail@email.com&&assunto do email&&texto do email.")
         valida3 = true;
+        escreveu = true;
         res.end(results.toString());
       }
-    } else if ((incomingWhatsappMsg != '' && valida3 || escreveu)) {
+    }
+    else if ((incomingWhatsappMsg != '' && valida3 && escreveu)) {
       email.enviarEmail(req.body.Body)
       res.header("Content-Type", "text/xml").status(200);
       results.body("Sua mensagem foi enviada com sucesso para nosso email. Fique atento que em breve retornaremos.\nDigite voltar para ir para o menu")
+      escreveu = false;
+      valida3 = false
       res.end(results.toString());
 
     } else if ((incomingWhatsappMsg == '5' && menu) || (incomingWhatsappMsg == '5' && voltar)) {
@@ -227,7 +231,7 @@ app.post("/whatsapp", async (req, res) => {
       res.end(quarto.envioDeQuartos(numero))
     }
 
-    else if (valida2 == true && incomingWhatsappMsg != "" && incomingWhatsappMsg!="2") {
+    else if (valida2 == true && incomingWhatsappMsg != "" && incomingWhatsappMsg != "2" && voltar) {
       const dados = req.body.Body
       console.log('valida 2' + valida2)
       await axios.delete("https://api-hotel-chatbot.herokuapp.com/cliente/" + dados)
@@ -250,7 +254,7 @@ app.post("/whatsapp", async (req, res) => {
   }
 });
 app.listen(process.env.PORT || 8080, function () {
-  console.log("Example app listening on port 3000!");
+  console.log("Server Rodando");
 });
 
 
