@@ -226,7 +226,7 @@ app.post("/whatsapp", async (req, res) => {
       res.end(quarto.envioDeQuartos(numero))
     }
 
-    else if (valida2 == true && incomingWhatsappMsg != "" && incomingWhatsappMsg=="2") {
+    else if (valida2 == true && incomingWhatsappMsg != "" && incomingWhatsappMsg!="2") {
       const dados = req.body.Body
       await axios.delete("https://api-hotel-chatbot.herokuapp.com/cliente/" + dados)
       res.writeHead(200, { "Content-Type": "text/xml" });
