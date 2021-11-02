@@ -182,6 +182,7 @@ app.post("/whatsapp", async (req, res) => {
     else if ((incomingWhatsappMsg == "2" && menu) || (incomingWhatsappMsg == "2" && voltar)) {
       res.header("Content-Type", "text/xml").status(200);
       results.body("Digite seu CPF para consultar uma reserva")
+      console.log('vvalida 1' + valida2)
       valida = true
       res.end(results.toString());
 
@@ -228,6 +229,7 @@ app.post("/whatsapp", async (req, res) => {
 
     else if (valida2 == true && incomingWhatsappMsg != "" && incomingWhatsappMsg!="2") {
       const dados = req.body.Body
+      console.log('valida 2' + valida2)
       await axios.delete("https://api-hotel-chatbot.herokuapp.com/cliente/" + dados)
       res.writeHead(200, { "Content-Type": "text/xml" });
       results.body("Sua Reserva foi cancelada.\nDigite *voltar* para acessar o menu.")
