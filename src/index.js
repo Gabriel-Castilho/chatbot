@@ -75,7 +75,7 @@ app.post("/whatsapp", async (req, res) => {
           results.body("Antes de iniciar uma reserva, preciso de alguns dados. Poderia informar por gentileza o seu nome, sobrenome,CPF separado por virgulas? \nExemplo: João,Silva,12345678901?\n*CONFIRME SEUS DADOS ANTES DE ENVIAR!!!*")
         }
       }
-      envio = undefined;
+      envio = undefined; 
       res.end(results.toString());
     } else if (envio == undefined) {
       const dados = req.body.Body.split(",")
